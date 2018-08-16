@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, NgForm, Validators } from '@angular/forms';
 import { CustomerService } from '../customer.service';
+import { Router } from '@angular/router';
 
 
 @Component({
@@ -15,7 +16,10 @@ export class AddCustomerComponent implements OnInit {
   phone: String = '';
   email: String = '';
 
-  constructor(private _service: CustomerService, private _formBuilder: FormBuilder
+  constructor(
+    private _service: CustomerService,
+    private _formBuilder: FormBuilder,
+    private router: Router
   ) { }
 
   ngOnInit() {
@@ -27,15 +31,14 @@ export class AddCustomerComponent implements OnInit {
   }
 
   onFormSubmit(form: NgForm) {
-    console.log(form);
-    // this._service.saveCustomer(form).subscribe(
-    //   res => {
-    //     console.log(res);
-    //   },
-    //   err => {
-    //     console.log(err);
-    //   }
-    // );
+    this._service.saveCustomer(form).subscribe(
+      res => {
+        this.router.navigateByUrl('list');
+      },
+      err => {
+        console.log(err);
+      }
+    );
   }
 
 }

@@ -2,15 +2,15 @@ import { Injectable } from '@angular/core';
 import { HttpResponse } from '@angular/common/http';
 
 @Injectable()
-export class RequestQueue<T> {
+export class RequestQueue {
 
-    _items: T[] = [];
+    _items: any = [];
 
-    push(val: T) {
+    push(val: any) {
         this._items.push(val);
     }
 
-    pop(): T | undefined {
+    pop(): any | undefined {
         return this._items.shift();
     }
 

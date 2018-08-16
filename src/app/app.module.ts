@@ -14,20 +14,20 @@ import { CustomerComponent } from './pages/customer/customer.component';
 import { CustomerService } from './customer.service';
 import { HttpClientModule } from '@angular/common/http';
 import { AddCustomerComponent } from './add-customer/add-customer.component';
-import { CommonModule } from '@angular/common';
 import { CacheInterceptor } from './auth/cache.interceptor';
-import { RequestCacheService } from './requestCache.service';
+import { RequestQueue } from './requestCache.service';
+
 
 const routes: Routes = [
   {
-    path: '', component: CustomerComponent,
+    path: 'list', component: CustomerComponent,
   },
   {
     path: 'create', component: AddCustomerComponent,
   },
   {
     path: '**',
-    redirectTo: '',
+    redirectTo: 'list',
   }
 ];
 
@@ -52,7 +52,7 @@ const routes: Routes = [
       multi: true
     },
     CustomerService,
-    RequestCacheService
+    RequestQueue
   ],
   bootstrap: [AppComponent]
 })

@@ -31,7 +31,8 @@
         {
             "name": "backend",
             "urls": [
-                "/customers"
+                "/customers",
+                "/list"
             ],
             "cacheConfig": {
                 "strategy": "freshness",

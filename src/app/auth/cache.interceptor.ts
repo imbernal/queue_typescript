@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
-import { HttpEvent, HttpResponse } from '@angular/common/http';
-import { RequestCacheService } from '../requestCache.service';
-import { Observable } from 'rxjs';
+import { HttpEvent, HttpResponse, HttpClient } from '@angular/common/http';
+import { Observable, of } from 'rxjs';
 import { tap } from 'rxjs/operators';
+// import { LocalStorage } from '@ngx-pwa/local-storage';
+import { Router } from '@angular/router';
 
-// import 'rxjs/add/operator/do';
+
 
 import {
     HttpRequest,
@@ -12,34 +13,41 @@ import {
     HttpInterceptor
 } from '@angular/common/http';
 
-const TTL = 10;
 
 @Injectable()
 export class CacheInterceptor implements HttpInterceptor {
-    constructor(private cache: RequestCacheService) { }
 
+    constructor(private router: Router) { }
     intercept(req: HttpRequest<any>, next: HttpHandler) {
-        const cachedResponse = this.cache.get(req.url);
-        if (cachedResponse) {
-            return Observable.of(cachedResponse);
-        } else {
-            return this.sendRequest(req, next);
-        }
 
+        // if (req.method === 'POST') {
+        //     localStorage[req.body.email] = JSON.stringify(req);
+        // }
+
+        // let db = indexedDB.open('customers', 1);
+
+        // Object.keys(localStorage).forEach(function (key) {
+        //     console.log(JSON.parse(localStorage.getItem(key)));
+        // });
+        // navigator.serviceWorker.
+
+        return this.sendRequest(req, next);
     }
+
 
     sendRequest(
         req: HttpRequest<any>,
         next: HttpHandler
     ): Observable<HttpEvent<any>> {
-        return next.handle(req).pipe(
-            tap(event => {
-                if (event instanceof HttpResponse) {
-                    this.cache.set(req.url, event, null);
-                }
-            }, error => {
-                console.error('NICE ERROR', error);
-            })
-        );
+        if (req.method === 'POST' && navigator.onLine) {
+
+            localStorage[req.body.email] = JSON.stringify(req);
+            this.router.navigateByUrl('list');
+
+            return;
+        } else {
+            localStorage.clear();
+            return next.handle(req);
+        }
     }
 }
