@@ -1,9 +1,11 @@
-import { Injectable } from '@angular/core';
-import { HttpEvent, HttpResponse, HttpClient } from '@angular/common/http';
+import { Injectable, Injector } from '@angular/core';
+import { HttpEvent, HttpResponse, HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { tap, map } from 'rxjs/operators';
 // import { LocalStorage } from '@ngx-pwa/local-storage';
-import { Router } from '@angular/router';
+import { Router, NavigationEnd } from '@angular/router';
+import { CustomerService } from '../customer.service';
+import { UUID } from 'angular2-uuid';
 
 
 
@@ -14,23 +16,19 @@ import {
 } from '@angular/common/http';
 
 
+// ngsw:1:data:dynamic:pwa-offline:cache
+
 @Injectable()
 export class CacheInterceptor implements HttpInterceptor {
 
-    constructor(private router: Router) { }
+    private httpOptions = {
+        headers: new HttpHeaders({ 'Content-Type': 'application/json' })
+    };
+
+    constructor(private router: Router, private _customerService: CustomerService, private http: HttpClient) {
+    }
+
     intercept(req: HttpRequest<any>, next: HttpHandler) {
-
-        // if (req.method === 'POST') {
-        //     localStorage[req.body.email] = JSON.stringify(req);
-        // }
-
-        // let db = indexedDB.open('customers', 1);
-
-        // Object.keys(localStorage).forEach(function (key) {
-        //     console.log(JSON.parse(localStorage.getItem(key)));
-        // });
-        // navigator.serviceWorker.
-
         return this.sendRequest(req, next);
     }
 
@@ -39,14 +37,41 @@ export class CacheInterceptor implements HttpInterceptor {
         req: HttpRequest<any>,
         next: HttpHandler
     ): Observable<HttpEvent<any>> {
-        if (req.method === 'POST' && navigator.onLine) {
 
-            localStorage[req.body.email] = JSON.stringify(req);
-            this.router.navigateByUrl('list');
 
-            return;
+        if (req.method === 'POST' && !navigator.onLine) {
+
+            caches.match(req.url).then((response) => {
+
+                if (response) {
+
+                    response.json().then((json) => {
+
+                        const newData = Array.from(json);
+
+                        req.body._id = UUID.UUID();
+                        req.body.isOffline = true;
+
+                        newData.push(req.body);
+
+                        const jsonResponse = new Response(JSON.stringify(newData), {
+                            headers: {
+                                'content-type': 'application/json'
+                            }
+                        });
+                        caches.open('ngsw:1:data:dynamic:pwa-offline:cache').then(cache => {
+                            cache.put(req.url, jsonResponse);
+                        });
+                    });
+                }
+            });
+
+            localStorage.setItem(req.body.email, JSON.stringify(req.body));
+            this.router.navigateByUrl('/');
+
+
         } else {
-            localStorage.clear();
+            console.log('Coo', req);
             return next.handle(req);
         }
     }

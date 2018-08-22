@@ -29,16 +29,15 @@
     ],
     "dataGroups": [
         {
-            "name": "backend",
+            "name": "pwa-offline",
             "urls": [
                 "/customers",
                 "/list"
             ],
             "cacheConfig": {
                 "strategy": "freshness",
-                "maxSize": 15,
-                "maxAge": "1h",
-                "timeout": "5s"
+                "maxSize": 100000,
+                "maxAge": "3d"
             }
         }
     ]

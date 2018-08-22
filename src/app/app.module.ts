@@ -15,12 +15,15 @@ import { CustomerService } from './customer.service';
 import { HttpClientModule } from '@angular/common/http';
 import { AddCustomerComponent } from './add-customer/add-customer.component';
 import { CacheInterceptor } from './auth/cache.interceptor';
-import { RequestQueue } from './requestCache.service';
+import { EditCustomerComponent } from './edit-customer/edit-customer.component';
 
 
 const routes: Routes = [
   {
     path: 'list', component: CustomerComponent,
+  },
+  {
+    path: 'edit/:id', component: EditCustomerComponent,
   },
   {
     path: 'create', component: AddCustomerComponent,
@@ -35,7 +38,8 @@ const routes: Routes = [
   declarations: [
     AppComponent,
     CustomerComponent,
-    AddCustomerComponent
+    AddCustomerComponent,
+    EditCustomerComponent
   ],
   imports: [
     BrowserModule,
@@ -51,8 +55,7 @@ const routes: Routes = [
       useClass: CacheInterceptor,
       multi: true
     },
-    CustomerService,
-    RequestQueue
+    CustomerService
   ],
   bootstrap: [AppComponent]
 })

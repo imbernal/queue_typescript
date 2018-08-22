@@ -34,9 +34,6 @@ export class AddCustomerComponent implements OnInit {
     this._service.saveCustomer(form).subscribe(
       res => {
         this.router.navigateByUrl('list');
-      },
-      err => {
-        console.log(err);
       }
     );
   }
